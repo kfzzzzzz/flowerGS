@@ -121,21 +121,18 @@
                 <!-- Info panel -->
                 <div class="info-panel glass-panel">
                     <div class="bouquet-header">
-                        <h2 class="bouquet-title">「繁星落雨」</h2>
-                        <span class="badge">法式浪漫</span>
+                        <h2 class="bouquet-title" id="res-title">「生成中...」</h2>
+                        <span class="badge" id="res-style">样式</span>
                     </div>
                     
                     <div class="poem-card">
-                        <p>“即使在最低落的雨天，也有繁星在为你等待。这束花用柔和的蓝紫色调，为您编制一个安静治愈的梦境。”</p>
+                        <p id="res-poem">...</p>
                     </div>
 
                     <div class="materials-list">
                         <h3>花材清单</h3>
-                        <ul>
-                            <li><span class="dot"></span><strong>主花：</strong> 碎冰蓝玫瑰、洋桔梗</li>
-                            <li><span class="dot"></span><strong>配花：</strong> 蓝星花、小雏菊</li>
-                            <li><span class="dot"></span><strong>配叶：</strong> 尤加利叶、银叶菊</li>
-                            <li><span class="dot"></span><strong>包装：</strong> 雾面半透明纯白包装纸配丝带</li>
+                        <ul id="res-materials">
+                            <!-- Inject list items here -->
                         </ul>
                     </div>
                     
@@ -159,6 +156,8 @@
     </template>
 
     <!-- Scripts -->
+    <script src="js/prompt.js" defer></script>
+    <script src="js/api.js" defer></script>
     <script src="js/main.js" defer></script>
 </body>
 </html>

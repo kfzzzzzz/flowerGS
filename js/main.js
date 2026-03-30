@@ -24,6 +24,7 @@ const STYLES = [
 const state = {
     selectedMoods: new Set(),
     selectedStyle: null,
+    currentResult: null,
     history: []
 };
 
@@ -172,9 +173,9 @@ class Router {
         });
     }
 
-    renderLoading() {
-        // Simulate AI API call delay
-        const titles = ["正在挑选主花...", "正在搭配绿叶...", "正在构思花语...", "正在渲染 3D 效果..."];
+    async renderLoading() {
+        // AI generation simulation texts
+        const titles = ["正在倾听您的心弦...", "正在挑选主花与绿叶...", "正在构思专属花语...", "正在渲染最终效果..."];
         const msgEl = document.querySelector('.loading-subtitle');
         
         let index = 0;
@@ -183,12 +184,26 @@ class Router {
             if (index < titles.length && msgEl) {
                 msgEl.textContent = titles[index];
             }
-        }, 800);
+        }, 1200); // Slower updates to match API time
 
-        setTimeout(() => {
+        try {
+            // Get selected user parameters
+            const moodNames = Array.from(state.selectedMoods).map(id => MOODS.find(m => m.id === id).label);
+            const styleObj = STYLES.find(s => s.id === state.selectedStyle);
+            const styleName = styleObj ? styleObj.name : "自然风格";
+
+            // Trigger Zhipu GLM-4.5-Flash API
+            const resultData = await generateBouquetData(moodNames, styleName);
+            
+            // Output format validated by API helper
+            state.currentResult = resultData;
+            
+        } catch (error) {
+            console.error("生成异常", error);
+        } finally {
             clearInterval(interval);
             this.navigate('result');
-        }, 3500);
+        }
     }
 
     renderResult() {
@@ -210,18 +225,43 @@ class Router {
         });
 
 
+        // Handle dynamic data rendering
+        const resTitle = document.getElementById('res-title');
+        const resStyle = document.getElementById('res-style');
+        const resPoem = document.getElementById('res-poem');
+        const resMaterials = document.getElementById('res-materials');
 
-        // Save to History (Mock)
-        if (state.selectedStyle && state.selectedMoods.size > 0) {
+        const styleObj = STYLES.find(s => s.id === state.selectedStyle);
+        const styleName = styleObj ? styleObj.name : "艺术花艺";
+
+        if (state.currentResult) {
+            const data = state.currentResult;
+            resTitle.textContent = data.title;
+            resStyle.textContent = styleName;
+            resPoem.textContent = `“${data.poem}”`;
+
+            // Clear and inject lists
+            resMaterials.innerHTML = '';
+            if (data.materials && Array.isArray(data.materials)) {
+                data.materials.forEach(mat => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span class="dot"></span><strong>${mat.type}：</strong> ${mat.name}`;
+                    resMaterials.appendChild(li);
+                });
+            }
+        }
+
+        // Save to History
+        if (state.currentResult && state.selectedStyle && state.selectedMoods.size > 0) {
             const moodNames = Array.from(state.selectedMoods).map(id => MOODS.find(m => m.id === id).label);
-            const styleObj = STYLES.find(s => s.id === state.selectedStyle);
             
             // Only add once per gen
             if (!state.history.some(h => h.timestamp > Date.now() - 5000)) {
                 state.history.push({
-                    title: '「繁星落雨」',
+                    title: state.currentResult.title,
                     moods: moodNames,
-                    style: styleObj.name,
+                    style: styleName,
+                    resultData: state.currentResult,
                     timestamp: Date.now()
                 });
             }
@@ -252,7 +292,7 @@ class Router {
             el.style.padding = '20px';
             
             el.innerHTML = `
-                <div style="height: 160px; background: url('flowertest.png') center/contain no-repeat; margin-bottom: 16px;"></div>
+                <div style="height: 160px; background: url('auth-bg.jpg') center/cover no-repeat; margin-bottom: 16px; border-radius:12px;"></div>
                 <h3 style="margin-bottom: 8px;">${item.title}</h3>
                 <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px;">基于心情：${item.moods.join('、')}</p>
                 <span class="badge">${item.style}</span>
