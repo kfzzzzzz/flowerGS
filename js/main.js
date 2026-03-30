@@ -209,32 +209,7 @@ class Router {
             alert('分享链接已复制，快去分享给朋友吧！');
         });
 
-        // 360 degree drag simulation interaction
-        const image = document.getElementById('bouquet-view');
-        let isDragging = false;
-        let startX = 0;
-        let rotation = 0;
 
-        image.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            startX = e.clientX;
-        });
-
-        window.addEventListener('mouseup', () => {
-            isDragging = false;
-        });
-
-        window.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            const deltaX = e.clientX - startX;
-            startX = e.clientX;
-            
-            rotation += deltaX * 0.5;
-            // Since we use a static image, we simulate 3D rotation with simple scale and skew, or just slight translations to mimic "parallax"
-            // Since requirements say "fixed image", we just do a parallax wiggle
-            const constrain = Math.max(-20, Math.min(rotation, 20));
-            image.style.transform = `perspective(1000px) rotateY(${constrain}deg)`;
-        });
 
         // Save to History (Mock)
         if (state.selectedStyle && state.selectedMoods.size > 0) {

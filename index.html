@@ -111,11 +111,11 @@
             
             <div class="result-layout">
                 <!-- 3D/Image viewer area -->
-                <div class="viewer-container">
+                <div class="viewer-container" style="padding: 0; overflow: hidden; background: transparent;">
                     <div class="viewer-hint">
-                        <span class="icon">🔄</span> 拖动以 360° 预览
+                        <span class="icon">🔄</span> 滑动以全方位 3D 预览
                     </div>
-                    <img src="flowertest.png" alt="Generated Bouquet" class="bouquet-image" id="bouquet-view">
+                    <iframe src="viewer3d.html" style="width: 100%; height: 100%; border: none; background: transparent;" allowtransparency="true"></iframe>
                 </div>
 
                 <!-- Info panel -->
