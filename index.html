@@ -13,7 +13,7 @@
 <body>
     <div id="app" class="app-container">
         <!-- Sidebar Navigation -->
-        <nav class="sidebar">
+        <nav class="sidebar" id="app-sidebar">
             <div class="logo">
                 <span class="logo-icon">✨</span>
                 <span class="logo-text">AI Flora</span>
@@ -25,7 +25,7 @@
         </nav>
 
         <!-- Main Content Area -->
-        <main class="main-content">
+        <main class="main-content" id="app-main">
             <div id="router-view" class="page-transition">
                 <!-- Page content will be injected here -->
             </div>
@@ -148,10 +148,65 @@
             </header>
             <div class="collection-grid">
                 <!-- Javascript will populate these -->
-                <div class="collection-card empty-state">
-                    <div class="empty-icon">🌸</div>
-                    <p>暂无收藏的花束，快去定制一束吧</p>
+            </div>
+        </div>
+    </template>
+
+    <!-- 6. Login Page -->
+    <template id="tmpl-login">
+        <div class="page auth-page">
+            <div class="auth-card glass-panel">
+                <div class="auth-header">
+                    <span class="logo-icon">✨</span>
+                    <h2>登录 AI Flora</h2>
+                    <p>开启你的情感花艺定制之旅</p>
                 </div>
+                <form id="form-login" class="auth-form">
+                    <div class="form-group">
+                        <label>用户名</label>
+                        <input type="text" id="login-username" class="form-control" autocomplete="off" placeholder="默认直接点击登录也可">
+                    </div>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <input type="password" id="login-password" class="form-control" placeholder="密码">
+                    </div>
+                    <div class="error-msg" id="login-error"></div>
+                    <button type="submit" class="btn-primary w-100 mt-1">立刻登录</button>
+                    <div class="auth-footer">
+                        还没有账号？ <a href="#" id="link-to-register">注册一个新账号</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </template>
+
+    <!-- 7. Register Page -->
+    <template id="tmpl-register">
+        <div class="page auth-page">
+            <div class="auth-card glass-panel">
+                <div class="auth-header">
+                    <span class="logo-icon">🌸</span>
+                    <h2>注册账号</h2>
+                    <p>加入 AI 虚拟花艺平台</p>
+                </div>
+                <form id="form-register" class="auth-form">
+                    <div class="form-group">
+                        <label>用户名</label>
+                        <input type="text" id="reg-username" class="form-control" required placeholder="设置一个好听的名字">
+                    </div>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <input type="password" id="reg-password" class="form-control" required placeholder="设置安全密码">
+                    </div>
+                    <div class="form-group">
+                        <label>确认密码</label>
+                        <input type="password" id="reg-password-confirm" class="form-control" required placeholder="再次输入密码">
+                    </div>
+                    <button type="submit" class="btn-primary w-100 mt-1">完成注册</button>
+                    <div class="auth-footer">
+                        已有账号？ <a href="#" id="link-to-login">返回登录</a>
+                    </div>
+                </form>
             </div>
         </div>
     </template>
