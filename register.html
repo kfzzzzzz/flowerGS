@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册 | AI Flora</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/auth.js" defer></script>
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-cover" style="background-image: url('auth-bg.jpg');">
+            <div class="cover-overlay"></div>
+            <div class="cover-content">
+                <div class="cover-logo"><span class="logo-icon">✨</span> AI Flora</div>
+                <h1>注册 AI Flora<br>开启第一次对话</h1>
+                <p class="cover-subtitle">创建一个账号，让系统记住你的偏好与足迹，记录每一次感动。</p>
+            </div>
+        </div>
+        <div class="auth-panel">
+            <div class="auth-form-container" style="max-width: 400px; padding: 20px 0;">
+                <div class="auth-header" style="margin-bottom: 24px;">
+                    <h2>注册新账号</h2>
+                    <p>只需几步，即可加入虚拟花艺工坊</p>
+                </div>
+                <!-- ID must match what auth.js expects -->
+                <form id="form-register" class="auth-form">
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label>用户名</label>
+                        <input type="text" id="reg-username" class="form-control" required placeholder="设置一个好听的名字">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label>密码</label>
+                        <input type="password" id="reg-password" class="form-control" required placeholder="设置安全密码">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 24px;">
+                        <label>确认密码</label>
+                        <input type="password" id="reg-password-confirm" class="form-control" required placeholder="再次输入密码">
+                    </div>
+                    <button type="submit" class="btn-primary w-100">完成注册</button>
+                    <div class="auth-footer">
+                        已有账号？ <a href="login.html">返回登录</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

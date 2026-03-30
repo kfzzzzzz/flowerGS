@@ -32,8 +32,6 @@ class Router {
     constructor() {
         this.view = document.getElementById('router-view');
         this.routes = {
-            'login': this.renderLogin.bind(this),
-            'register': this.renderRegister.bind(this),
             'home': this.renderHome.bind(this),
             'style': this.renderStyle.bind(this),
             'loading': this.renderLoading.bind(this),
@@ -54,20 +52,13 @@ class Router {
     }
 
     navigate(route) {
-        // Toggle Auth Mode UI (hides sidebar, resets layout)
-        const appContainer = document.getElementById('app');
-        if (route === 'login' || route === 'register') {
-            appContainer.classList.add('auth-mode');
-        } else {
-            appContainer.classList.remove('auth-mode');
-            // update active link in navbar
-            document.querySelectorAll('.nav-links a').forEach(l => {
-                l.classList.remove('active');
-                if (l.dataset.route === route || (route === 'result' && l.dataset.route === 'home') || (route === 'loading' && l.dataset.route === 'home') || (route === 'style' && l.dataset.route === 'home')) {
-                    l.classList.add('active');
-                }
-            });
-        }
+        // update active link in navbar
+        document.querySelectorAll('.nav-links a').forEach(l => {
+            l.classList.remove('active');
+            if (l.dataset.route === route || (route === 'result' && l.dataset.route === 'home') || (route === 'loading' && l.dataset.route === 'home') || (route === 'style' && l.dataset.route === 'home')) {
+                l.classList.add('active');
+            }
+        });
 
         // Simple animation trigger
         this.view.style.opacity = '0';
@@ -87,56 +78,6 @@ class Router {
             
             this.view.style.opacity = '1';
         }, 150);
-    }
-
-    // --- Auth Handlers ---
-    renderLogin() {
-        const form = document.getElementById('form-login');
-        const errorMsg = document.getElementById('login-error');
-        const linkRegister = document.getElementById('link-to-register');
-
-        linkRegister.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.navigate('register');
-        });
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const user = document.getElementById('login-username').value;
-            const pass = document.getElementById('login-password').value;
-
-            // Mock authentication rules
-            if ((user === '' && pass === '') || (user === 'test' && pass === '123456')) {
-                errorMsg.textContent = '';
-                this.navigate('home');
-            } else {
-                errorMsg.textContent = '用户名或密码错误。使用空密码或test/123456。';
-            }
-        });
-    }
-
-    renderRegister() {
-        const form = document.getElementById('form-register');
-        const linkLogin = document.getElementById('link-to-login');
-
-        linkLogin.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.navigate('login');
-        });
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const pass = document.getElementById('reg-password').value;
-            const passConfirm = document.getElementById('reg-password-confirm').value;
-
-            if (pass !== passConfirm) {
-                alert('两次输入的密码不一致！');
-                return;
-            }
-            // Mock register success and route to home or login
-            alert('注册成功！(演示环境)');
-            this.navigate('home');
-        });
     }
 
     // --- Page Handlers ---
@@ -350,5 +291,5 @@ class Router {
 document.addEventListener('DOMContentLoaded', () => {
     const app = new Router();
     // Default route
-    app.navigate('login');
+    app.navigate('home');
 });

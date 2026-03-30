@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 | AI Flora</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/auth.js" defer></script>
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-cover" style="background-image: url('auth-bg.jpg');">
+            <div class="cover-overlay"></div>
+            <div class="cover-content">
+                <div class="cover-logo"><span class="logo-icon">✨</span> AI Flora</div>
+                <h1>让 AI 读懂你的心<br>定制专属情感花艺</h1>
+                <p class="cover-subtitle">登录后，你将可以体验基于自然语言和情绪分析生成的虚拟花艺，并通过 3D 视角细细品味每一片花瓣携带的柔情。</p>
+                <ul class="feature-list">
+                    <li><span class="icon">🌸</span> 聚合多种心情符号，为你精准匹配色彩与花材</li>
+                    <li><span class="icon">🎨</span> 从法式复古到极简侘寂，海量艺术风格信手拈来</li>
+                    <li><span class="icon">💾</span> 自动珍藏历史作品，回味每一个动容瞬间</li>
+                </ul>
+            </div>
+        </div>
+        <div class="auth-panel">
+            <div class="auth-form-container">
+                <div class="auth-header">
+                    <h2>登录 AI Flora</h2>
+                    <p>欢迎回来，期待聆听您的新故事</p>
+                </div>
+                <!-- ID must match what auth.js expects -->
+                <form id="form-login" class="auth-form">
+                    <div class="form-group">
+                        <label>用户名</label>
+                        <input type="text" id="login-username" class="form-control" autocomplete="off" placeholder="默认无需填写，直接登录">
+                    </div>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <input type="password" id="login-password" class="form-control" placeholder="密码">
+                    </div>
+                    <div class="error-msg" id="login-error"></div>
+                    <button type="submit" class="btn-primary w-100">立刻登录</button>
+                    <div class="auth-footer">
+                        还没有账号？ <a href="register.html">注册新账号</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
