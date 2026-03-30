@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 花艺定制 | 情感驱动设计</title>
+    <!-- Google Fonts for modern typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app" class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="logo">
+                <span class="logo-icon">✨</span>
+                <span class="logo-text">AI Flora</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" data-route="home" class="active">定制花束</a></li>
+                <li><a href="#" data-route="collection">我的收藏</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <div id="router-view" class="page-transition">
+                <!-- Page content will be injected here -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Templates -->
+    
+    <!-- 1. Mood Selection Page -->
+    <template id="tmpl-home">
+        <div class="page mood-page">
+            <header class="page-header">
+                <h1>讲述你的心情故事</h1>
+                <p>AI 将根据您的情感状态，定制独一无二的花束设计</p>
+            </header>
+            
+            <section class="mood-section">
+                <h2>当前的心情 / 场景</h2>
+                <div class="tags-container" id="mood-tags">
+                    <!-- Javascript will populate these -->
+                </div>
+            </section>
+            
+            <div class="action-bar hide" id="home-action">
+                <button class="btn-primary" id="btn-next-style">下一步：选择风格 <span>→</span></button>
+            </div>
+        </div>
+    </template>
+
+    <!-- 2. Style Selection Page -->
+    <template id="tmpl-style">
+        <div class="page style-page">
+            <header class="page-header">
+                <button class="btn-back" id="btn-back-home">← 返回</button>
+                <h1>选择花艺风格</h1>
+                <p>为您推荐了最匹配当前心情的艺术风格</p>
+            </header>
+            
+            <div class="style-carousel" id="style-cards">
+                <!-- Javascript will populate these -->
+            </div>
+
+            <div class="action-bar hide" id="style-action">
+                <button class="btn-primary generate-btn" id="btn-generate">
+                    <span class="sparkle">✨</span> 开始 AI 生成
+                </button>
+            </div>
+        </div>
+    </template>
+
+    <!-- 3. Loading (Generating) Page -->
+    <template id="tmpl-loading">
+        <div class="page loading-page">
+            <div class="loader-container">
+                <div class="ai-orb"></div>
+                <div class="loading-text">
+                    <h2>正在倾听您的心声...</h2>
+                    <p class="loading-subtitle">AI 花艺师正在为您组合花材</p>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- 4. Result (Bouquet Display) Page -->
+    <template id="tmpl-result">
+        <div class="page result-page">
+            <header class="page-header flex-header">
+                <button class="btn-back" id="btn-back-style">← 重新定制</button>
+                <div class="actions">
+                    <button class="btn-icon" id="btn-save" title="保存到相册">💾 保存</button>
+                    <button class="btn-icon" id="btn-share" title="分享">🔗 分享</button>
+                </div>
+            </header>
+            
+            <div class="result-layout">
+                <!-- 3D/Image viewer area -->
+                <div class="viewer-container">
+                    <div class="viewer-hint">
+                        <span class="icon">🔄</span> 拖动以 360° 预览
+                    </div>
+                    <img src="flowertest.png" alt="Generated Bouquet" class="bouquet-image" id="bouquet-view">
+                </div>
+
+                <!-- Info panel -->
+                <div class="info-panel glass-panel">
+                    <div class="bouquet-header">
+                        <h2 class="bouquet-title">「繁星落雨」</h2>
+                        <span class="badge">法式浪漫</span>
+                    </div>
+                    
+                    <div class="poem-card">
+                        <p>“即使在最低落的雨天，也有繁星在为你等待。这束花用柔和的蓝紫色调，为您编制一个安静治愈的梦境。”</p>
+                    </div>
+
+                    <div class="materials-list">
+                        <h3>花材清单</h3>
+                        <ul>
+                            <li><span class="dot"></span><strong>主花：</strong> 碎冰蓝玫瑰、洋桔梗</li>
+                            <li><span class="dot"></span><strong>配花：</strong> 蓝星花、小雏菊</li>
+                            <li><span class="dot"></span><strong>配叶：</strong> 尤加利叶、银叶菊</li>
+                            <li><span class="dot"></span><strong>包装：</strong> 雾面半透明纯白包装纸配丝带</li>
+                        </ul>
+                    </div>
+                    
+                    <button class="btn-secondary mt-1" id="btn-re-generate">不满意？重新生成</button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- 5. Collection Page -->
+    <template id="tmpl-collection">
+        <div class="page collection-page">
+            <header class="page-header">
+                <h1>我的收藏</h1>
+                <p>回顾您所有的花艺故事</p>
+            </header>
+            <div class="collection-grid">
+                <!-- Javascript will populate these -->
+                <div class="collection-card empty-state">
+                    <div class="empty-icon">🌸</div>
+                    <p>暂无收藏的花束，快去定制一束吧</p>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Scripts -->
+    <script src="js/main.js" defer></script>
+</body>
+</html>
