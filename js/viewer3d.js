@@ -743,7 +743,7 @@ async function main() {
         viewMatrix = JSON.parse(decodeURIComponent(location.hash.slice(1)));
         carousel = false;
     } catch (err) { }
-    const url = params.get("url") || "https://picgo.kfzzzzzz.cn/flowerGS/flower3.splat";
+    const url = params.get("url") || "https://picgo.kfzzzzzz.cn/flowerGS/flowerdata3.splat";
     const req = await fetch(url, {
         mode: "cors", // no-cors, *cors, same-origin
         credentials: "omit", // include, *same-origin, omit

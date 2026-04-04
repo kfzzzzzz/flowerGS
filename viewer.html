@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Splat Viewer</title>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #222;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        #drop-zone {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            font-family: sans-serif;
+            font-size: 24px;
+            pointer-events: none;
+            transition: background 0.2s, color 0.2s;
+            z-index: 10;
+        }
+
+        #drop-zone.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        #drop-zone.hidden {
+            display: none;
+        }
+    </style>
+    <!-- Import Map for PlayCanvas using ESM -->
+    <script type="importmap">
+        {
+            "imports": {
+                "playcanvas": "https://esm.run/playcanvas@2.17.2"
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <canvas id="application-canvas"></canvas>
+    <div id="drop-zone">Drop a .splat or .ply file here</div>
+
+    <script type="module">
+        import * as pc from 'playcanvas';
+
+        const canvas = document.getElementById('application-canvas');
+        const dropZone = document.getElementById('drop-zone');
+
+        const app = new pc.Application(canvas, {
+            mouse: new pc.Mouse(document.body),
+            touch: new pc.TouchDevice(document.body),
+            graphicsDeviceOptions: {
+                deviceTypes: ['webgl2'],
+                antialias: true,
+                depth: false,
+                stencil: false,
+                powerPreference: 'high-performance'
+            }
+        });
+
+        // Ensure rendering is sharp on high-DPI displays (retina screens/phones)
+        app.graphicsDevice.maxPixelRatio = window.devicePixelRatio;
+        app.start();
+
+        // Fill window
+        app.setCanvasFillMode(pc.FILL_WINDOW);
+        app.setCanvasResolution(pc.RESOLUTION_AUTO);
+
+        // Ensure window resize is handled correctly
+        window.addEventListener('resize', () => {
+            app.resizeCanvas(canvas.width, canvas.height);
+        });
+
+        // Setup the scene camera
+        const camera = new pc.Entity('Camera');
+        camera.addComponent('camera', {
+            clearColor: new pc.Color(0.1, 0.1, 0.1)
+        });
+        app.root.addChild(camera);
+
+        // Very simple orbit camera script logic implementation
+        let azim = 45;
+        let elev = -15;
+        let distance = 5;
+        let targetPoint = new pc.Vec3(0, 0, 0);
+
+        const updateCameraPose = () => {
+            // clamp elevation
+            elev = pc.math.clamp(elev, -90, 90);
+
+            const ex = elev * pc.math.DEG_TO_RAD;
+            const ey = azim * pc.math.DEG_TO_RAD;
+
+            const s1 = Math.sin(-ex);
+            const c1 = Math.cos(-ex);
+            const s2 = Math.sin(-ey);
+            const c2 = Math.cos(-ey);
+
+            // Forward vector
+            const forward = new pc.Vec3(-c1 * s2, s1, c1 * c2);
+
+            const pos = new pc.Vec3().copy(forward).mulScalar(distance).add(targetPoint);
+            camera.setLocalPosition(pos);
+            camera.lookAt(targetPoint);
+        };
+
+        updateCameraPose();
+
+        // Mouse and Touch events for Orbiting
+        if (app.mouse) {
+            app.mouse.on(pc.EVENT_MOUSEMOVE, (e) => {
+                if (e.buttons[pc.MOUSEBUTTON_LEFT]) { // Orbit
+                    azim -= e.dx * 0.25;
+                    elev -= e.dy * 0.25;
+                    updateCameraPose();
+                } else if (e.buttons[pc.MOUSEBUTTON_RIGHT]) { // Pan
+                    const right = camera.forward.clone().cross(camera.up).normalize();
+                    const up = camera.up.clone();
+                    const panScale = distance * 0.001;
+                    targetPoint.add(right.mulScalar(-e.dx * panScale));
+                    targetPoint.add(up.mulScalar(e.dy * panScale));
+                    updateCameraPose();
+                }
+            });
+
+            app.mouse.on(pc.EVENT_MOUSEWHEEL, (e) => {
+                distance += e.wheelDelta * distance * 0.1;
+                distance = Math.max(0.01, distance);
+                updateCameraPose();
+            });
+
+            // disable context menu
+            app.mouse.on(pc.EVENT_MOUSEDOWN, (e) => {
+                if (e.button === pc.MOUSEBUTTON_RIGHT) {
+                    e.event.preventDefault();
+                }
+            });
+            window.addEventListener('contextmenu', e => e.preventDefault());
+        }
+
+        if (app.touch) {
+            let lastTouchPoint = new pc.Vec2();
+            let lastTouchPinchDist = 0;
+
+            app.touch.on(pc.EVENT_TOUCHMOVE, (e) => {
+                if (e.touches.length === 1) {
+                    const touch = e.touches[0];
+                    azim -= (touch.x - lastTouchPoint.x) * 0.25;
+                    elev -= (touch.y - lastTouchPoint.y) * 0.25;
+                    lastTouchPoint.set(touch.x, touch.y);
+                    updateCameraPose();
+                } else if (e.touches.length === 2) {
+                    const t1 = e.touches[0];
+                    const t2 = e.touches[1];
+                    const dx = t1.x - t2.x;
+                    const dy = t1.y - t2.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (lastTouchPinchDist > 0) {
+                        const delta = lastTouchPinchDist - dist;
+                        distance += delta * distance * 0.005;
+                        distance = Math.max(0.01, distance);
+                        updateCameraPose();
+                    }
+                    lastTouchPinchDist = dist;
+                }
+            });
+            app.touch.on(pc.EVENT_TOUCHSTART, (e) => {
+                if (e.touches.length === 1) {
+                    const touch = e.touches[0];
+                    lastTouchPoint.set(touch.x, touch.y);
+                    lastTouchPinchDist = 0;
+                }
+            });
+            app.touch.on(pc.EVENT_TOUCHEND, () => {
+                lastTouchPinchDist = 0;
+            });
+        }
+
+        let currentSplatEntity = null;
+
+        const loadSplatFile = (file) => {
+            const url = URL.createObjectURL(file);
+
+            // Hide drop text
+            dropZone.classList.add('hidden');
+
+            app.assets.loadFromUrlAndFilename(url, file.name, "gsplat", (err, asset) => {
+                if (err) {
+                    console.error("Error loading splat:", err);
+                    dropZone.classList.remove('hidden');
+                    dropZone.textContent = "Error loading splat.";
+                    URL.revokeObjectURL(url);
+                    return;
+                }
+
+                if (currentSplatEntity) {
+                    currentSplatEntity.destroy();
+                }
+
+                currentSplatEntity = new pc.Entity("Splat");
+                currentSplatEntity.addComponent("gsplat", {
+                    asset: asset
+                });
+                app.root.addChild(currentSplatEntity);
+
+                // Auto distance logic based on bounding box
+                if (currentSplatEntity.gsplat && currentSplatEntity.gsplat.instance) {
+                    const meshInstance = currentSplatEntity.gsplat.instance.meshInstance;
+                    if (meshInstance && meshInstance.aabb) {
+                        const aabb = meshInstance.aabb;
+                        targetPoint.copy(aabb.center);
+                        distance = Math.max(1, aabb.halfExtents.length() * 2);
+                    }
+                } else {
+                    targetPoint.set(0, 0, 0);
+                    distance = 5;
+                }
+
+                updateCameraPose();
+                URL.revokeObjectURL(url);
+            });
+        };
+
+        const loadSplatFromUrl = (url, filename) => {
+            dropZone.classList.add('hidden');
+            app.assets.loadFromUrlAndFilename(url, filename, "gsplat", (err, asset) => {
+                if (err) {
+                    console.error("Error loading splat:", err);
+                    dropZone.classList.remove('hidden');
+                    dropZone.textContent = "Error loading splat.";
+                    return;
+                }
+
+                if (currentSplatEntity) {
+                    currentSplatEntity.destroy();
+                }
+
+                currentSplatEntity = new pc.Entity("Splat");
+                currentSplatEntity.addComponent("gsplat", {
+                    asset: asset
+                });
+                app.root.addChild(currentSplatEntity);
+
+                // Auto distance logic based on bounding box
+                if (currentSplatEntity.gsplat && currentSplatEntity.gsplat.instance) {
+                    const meshInstance = currentSplatEntity.gsplat.instance.meshInstance;
+                    if (meshInstance && meshInstance.aabb) {
+                        const aabb = meshInstance.aabb;
+                        targetPoint.copy(aabb.center);
+                        distance = Math.max(1, aabb.halfExtents.length() * 2);
+                    }
+                } else {
+                    targetPoint.set(0, 0, 0);
+                    distance = 5;
+                }
+
+                updateCameraPose();
+            });
+        };
+
+        // Automatically load the flower data
+        const paramUrl = new URLSearchParams(window.location.search).get("url");
+        const targetUrl = paramUrl || "https://picgo.kfzzzzzz.cn/flowerGS/flowerdata3.ply";
+
+        // Ensure filenames have the proper extension for PlayCanvas to select the correct parser
+        let targetFilename = targetUrl.split('/').pop() || "model.splat";
+        if (!targetFilename.toLowerCase().endsWith('.splat') && !targetFilename.toLowerCase().endsWith('.ply')) {
+            targetFilename += '.splat';
+        }
+
+        loadSplatFromUrl(targetUrl, targetFilename);
+
+        // File Drag & Drop Handling
+        document.body.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.add('active');
+            dropZone.classList.remove('hidden');
+        });
+
+        document.body.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.remove('active');
+        });
+
+        document.body.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.remove('active');
+
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                const file = e.dataTransfer.files[0];
+                const lowerName = file.name.toLowerCase();
+                if (lowerName.endsWith('.splat') || lowerName.endsWith('.ply')) {
+                    loadSplatFile(file);
+                } else {
+                    dropZone.textContent = "Please drop a .splat or .ply file";
+                    dropZone.classList.remove('hidden');
+                }
+            }
+        });
+
+    </script>
+</body>
+
+</html>
