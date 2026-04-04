@@ -73,15 +73,16 @@
             touch: new pc.TouchDevice(document.body),
             graphicsDeviceOptions: {
                 deviceTypes: ['webgl2'],
-                antialias: true,
+                antialias: false,
                 depth: false,
                 stencil: false,
                 powerPreference: 'high-performance'
             }
         });
 
-        // Ensure rendering is sharp on high-DPI displays (retina screens/phones)
-        app.graphicsDevice.maxPixelRatio = window.devicePixelRatio;
+        // Ensure rendering is sharp on high-DPI displays but clamp to 2
+        // to prevent `max renderbuffer size` WebGL crashes on Retina/4K screens
+        app.graphicsDevice.maxPixelRatio = Math.min(window.devicePixelRatio, 2);
         app.start();
 
         // Fill window
