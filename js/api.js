@@ -30,8 +30,8 @@ async function generateBouquetData(moods, style) {
                     { role: "user", content: userPrompt }
                 ],
                 response_format: { type: "json_object" },
-                temperature: 0.7,
-                max_tokens: 1024
+                temperature: 0.3,
+                max_tokens: 512
             })
         });
 
@@ -45,7 +45,7 @@ async function generateBouquetData(moods, style) {
         console.log("🤖 大模型原始原始响应(Raw):", data);
 
         const content = data.choices[0].message.content;
-        
+
         let parsedResult;
         try {
             const cleanStr = content.replace(/^\s*```json\s*/, '').replace(/\s*```\s*$/, '');
